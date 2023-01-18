@@ -42,7 +42,6 @@ export function createElement(tagName, props, children) {
   }
 
   if (Array.isArray(children)) {
-    elm.append(children);
     children.forEach((child) => {
       if (typeof child === "string") {
         elm.appendChild(document.createTextNode(child));

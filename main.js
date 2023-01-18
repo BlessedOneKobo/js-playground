@@ -9,6 +9,7 @@ const headingElm = createElement("h1", `Clicks ${data.clicks}`);
 const buttonElm = createElement(
   "button",
   {
+    style: "cursor: pointer",
     onClick: () => data.clicks++,
   },
   "Click me"
@@ -16,6 +17,8 @@ const buttonElm = createElement(
 const resetButtonElm = createElement(
   "button",
   {
+    style: "cursor: pointer",
+    disabled: !data.clicks,
     onClick: () => {
       if (data.clicks === 0) {
         return;
@@ -29,10 +32,20 @@ const resetButtonElm = createElement(
 const paraElm = createElement("p", `Resets ${data.resets}`);
 
 data.$watch("clicks", (value) => {
+  resetButtonElm.disabled = !value;
   headingElm.textContent = `Clicks ${value}`;
 });
 data.$watch("resets", (value) => {
   paraElm.textContent = `Resets ${value}`;
 });
 
-document.body.append(headingElm, buttonElm, resetButtonElm, paraElm);
+const app = createElement("div", { id: "app" }, [
+  headingElm,
+  createElement("div", { style: "display: flex; gap: 1rem;" }, [
+    buttonElm,
+    resetButtonElm,
+  ]),
+  paraElm,
+]);
+
+document.body.appendChild(app);
