@@ -1,38 +1,47 @@
-import { initToyReact } from "./lib.js";
+import { createElement, createState } from "./lib.js";
 
-const { useState } = initToyReact(App);
+const useState = createState(App);
 
 function App() {
-  const [counter, setCounter] = useState(0);
+  const mountPoint = document.getElementById("app");
+  const [clickCount, setClickCount] = useState(0);
+  const [resetCount, setResetCount] = useState(0);
 
-  const frag = document.createDocumentFragment();
-  const decrementButton = document.createElement("button");
-  decrementButton.textContent = "decrement";
-  decrementButton.addEventListener("click", () => {
-		setCounter(counter - 1);
-		setCounter(counter - 1);
-	});
-  if (counter) {
-    decrementButton.removeAttribute("disabled");
-  } else {
-    decrementButton.setAttribute("disabled", "");
-  }
+  const handleButtonClick = () => setClickCount(clickCount + 1);
+  const handleResetButtonClick = () => {
+    if (clickCount === 0) {
+      return;
+    }
+    setClickCount(0);
+    setResetCount(resetCount + 1);
+  };
 
-  const display = document.createElement("p");
-  display.textContent = counter === 0 ? "no clicks" : `${counter} clicks`;
-
-  const incrementButton = document.createElement("button");
-  incrementButton.textContent = "increment";
-  incrementButton.addEventListener("click", () => {
-		setCounter(counter + 1)
-		setCounter(counter + 1)
-		setCounter(counter + 1)
-	});
-
-  frag.append(decrementButton, display, incrementButton);
   mountPoint.innerHTML = "";
-  mountPoint.append(frag);
+  mountPoint.append(
+    createElement("#fragment", null, [
+      createElement("h1", `Clicks ${clickCount}`),
+      createElement("div", { style: "display: flex; gap: 1rem;" }, [
+        createElement(
+          "button",
+          {
+            style: "cursor: pointer",
+            onClick: handleButtonClick,
+          },
+          "Click me",
+        ),
+        createElement(
+          "button",
+          {
+            style: "cursor: pointer",
+            disabled: clickCount === 0,
+            onClick: handleResetButtonClick,
+          },
+          "Reset",
+        ),
+      ]),
+      createElement("p", `Resets ${resetCount}`),
+    ]),
+  );
 }
 
-const mountPoint = document.getElementById("app");
 App();

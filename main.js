@@ -12,7 +12,7 @@ const buttonElm = createElement(
     style: "cursor: pointer",
     onClick: () => data.clicks++,
   },
-  "Click me"
+  "Click me",
 );
 const resetButtonElm = createElement(
   "button",
@@ -27,7 +27,7 @@ const resetButtonElm = createElement(
       data.resets++;
     },
   },
-  "Reset"
+  "Reset",
 );
 const paraElm = createElement("p", `Resets ${data.resets}`);
 
@@ -39,13 +39,14 @@ data.$watch("resets", (value) => {
   paraElm.textContent = `Resets ${value}`;
 });
 
-const app = createElement("div", { id: "app" }, [
-  headingElm,
-  createElement("div", { style: "display: flex; gap: 1rem;" }, [
-    buttonElm,
-    resetButtonElm,
+const root = document.getElementById("app");
+root.append(
+  createElement("#fragment", null, [
+    headingElm,
+    createElement("div", { style: "display: flex; gap: 1rem;" }, [
+      buttonElm,
+      resetButtonElm,
+    ]),
+    paraElm,
   ]),
-  paraElm,
-]);
-
-document.body.appendChild(app);
+);

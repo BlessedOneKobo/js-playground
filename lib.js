@@ -21,32 +21,38 @@ export function reactive(obj) {
 }
 
 export function createElement(tagName, props, children) {
-  const elm = document.createElement(tagName);
+  let elm;
 
-  if (typeof props === "string") {
-    elm.innerHTML = props;
-  } else if (typeof props === "object" && props) {
-    Object.keys(props).forEach((k) => {
-      if (k.startsWith("on")) {
-        const evtName = k.slice(2);
-        elm.addEventListener(
-          `${evtName[0].toLowerCase()}${evtName.slice(1)}`,
-          props[k]
-        );
-      } else {
-        if (typeof props[k] === "boolean") {
-          if (props[k]) {
-            elm.setAttribute(k, "");
-          } else {
-            elm.removeAttribute(k);
-          }
-        } else {
-          elm.setAttribute(k, props[k]);
-        }
-      }
-    });
+  if (tagName === "#fragment") {
+    elm = document.createDocumentFragment();
   } else {
-    throw new Error("props must be a string or object");
+    elm = document.createElement(tagName);
+
+    if (typeof props === "string") {
+      elm.innerHTML = props;
+    } else if (typeof props === "object" && props) {
+      Object.keys(props).forEach((k) => {
+        if (k.startsWith("on")) {
+          const evtName = k.slice(2);
+          elm.addEventListener(
+            `${evtName[0].toLowerCase()}${evtName.slice(1)}`,
+            props[k],
+          );
+        } else {
+          if (typeof props[k] === "boolean") {
+            if (props[k]) {
+              elm.setAttribute(k, "");
+            } else {
+              elm.removeAttribute(k);
+            }
+          } else {
+            elm.setAttribute(k, props[k]);
+          }
+        }
+      });
+    } else {
+      throw new Error("props must be a string or object");
+    }
   }
 
   if (Array.isArray(children)) {
@@ -64,32 +70,32 @@ export function createElement(tagName, props, children) {
   return elm;
 }
 
-const hooks = [];
-let currentIdx = 0;
+export function createState(updateDOM) {
+  const hooks = [];
+  let currentHookIdx = 0;
 
-export function useHooks(updateDOM) {
-  return;
-}
+  const useState = (initialValue) => {
+    const pair = hooks[currentHookIdx];
+    if (pair) {
+      currentHookIdx++;
+      return pair;
+    }
 
-export function initToyReact(updateDOM) {
-  return {
-    useState(initialValue) {
-      const pair = hooks[currentIdx];
-      if (pair) {
-        currentIdx++;
-        return pair;
-      }
-
-      const idx = currentIdx;
-      function setValue(newValue) {
-        const pair = hooks[idx];
+    const idx = currentHookIdx;
+    function setValue(newValue) {
+      const pair = hooks[idx];
+      if (typeof newValue === "function") {
+        pair[0] = newValue(pair[0]);
+      } else {
         pair[0] = newValue;
-        currentIdx = 0;
-        updateDOM();
       }
+      currentHookIdx = 0;
+      updateDOM();
+    }
 
-      hooks[currentIdx] = [initialValue, setValue];
-      return hooks[currentIdx++];
-    },
+    hooks[currentHookIdx] = [initialValue, setValue];
+    return hooks[currentHookIdx++];
   };
+
+  return useState;
 }
