@@ -34,7 +34,15 @@ export function createElement(tagName, props, children) {
           props[k]
         );
       } else {
-        elm.setAttribute(k, props[k]);
+        if (typeof props[k] === "boolean") {
+          if (props[k]) {
+            elm.setAttribute(k, "");
+          } else {
+            elm.removeAttribute(k);
+          }
+        } else {
+          elm.setAttribute(k, props[k]);
+        }
       }
     });
   } else {
@@ -54,4 +62,34 @@ export function createElement(tagName, props, children) {
   }
 
   return elm;
+}
+
+const hooks = [];
+let currentIdx = 0;
+
+export function useHooks(updateDOM) {
+  return;
+}
+
+export function initToyReact(updateDOM) {
+  return {
+    useState(initialValue) {
+      const pair = hooks[currentIdx];
+      if (pair) {
+        currentIdx++;
+        return pair;
+      }
+
+      const idx = currentIdx;
+      function setValue(newValue) {
+        const pair = hooks[idx];
+        pair[0] = newValue;
+        currentIdx = 0;
+        updateDOM();
+      }
+
+      hooks[currentIdx] = [initialValue, setValue];
+      return hooks[currentIdx++];
+    },
+  };
 }
