@@ -15,10 +15,7 @@ const buttonElm = new Elm("button", "Click me").on(
 );
 
 const resetButtonElm = new Elm("button", "Reset")
-  .bind({
-    attr: "disabled",
-    value: Reactor.computed(() => !clicks.value),
-  })
+  .bind({ disabled: Reactor.computed(() => !clicks.value) })
   .on("click", () => {
     if (clicks.value === 0) {
       return;
@@ -33,8 +30,7 @@ const paraElm = new Elm(
 );
 
 const buttonContainer = new Elm("div").bind({
-  attr: "style",
-  value: "display: flex; gap: 1rem",
+  style: "display: flex; gap: 1rem",
 });
 buttonContainer.$el.append(buttonElm.$el, resetButtonElm.$el);
 
